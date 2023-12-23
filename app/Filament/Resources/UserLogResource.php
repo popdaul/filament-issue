@@ -34,13 +34,20 @@ class UserLogResource extends Resource
                 Tables\Columns\TextColumn::make('user_id'),
                 Tables\Columns\TextColumn::make('date'),
                 Tables\Columns\TextColumn::make('login_count')
-                ->summarize(Tables\Columns\Summarizers\Sum::make())
+                    ->summarize(Tables\Columns\Summarizers\Sum::make())
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('date')
+                    ->form([
+                        Forms\Components\DatePicker::make('start_date'),
+                        Forms\Components\DatePicker::make('end_date')
+                    ])
+                    ->query(function (Builder $builder, $data) {
+                        return $builder->whereBetween('date', [$data['start_date'], $data['end_date']]);
+                    })
             ])
             ->groups([
-                'user_id','date'
+                'user_id', 'date'
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
